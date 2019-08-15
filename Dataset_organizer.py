@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[32]:
+# In[10]:
 
 
 import os       #for directory handling
@@ -10,65 +10,68 @@ import datetime #get the current datetime
 import re       #for pattern matching in string
 
 
-# In[33]:
+# In[11]:
 
 
 # do not use / \ < > ? " * | symbols in class names => eg: don't use [[Road/Rail]]
-class_names = [
-           "Road-Rail",
-           "Water", 
-           "Air", 
-           "Fire", 
-           "Suicide", 
-           "Others"
-        ]
+
+cls_file = open("classes.txt", 'r')
+class_names = cls_file.read().splitlines()
+class_names = [cn for cn in class_names if len(cn)> 0]
+class_names
 
 
-# In[34]:
+# In[12]:
 
 
 classes = ["[["+c+"]]" for c in class_names]
 
 
-# In[35]:
+# In[13]:
 
+
+base = "nlp/"
+if not os.path.exists(base[:-1]):
+        os.makedirs(base[:-1])
 
 fn = "data.txt"
+
+data_path = base+fn
 try:
-    file = open(fn, 'r', encoding="utf8") # open existing file in R&W mode
+    file = open(data_path, 'r', encoding="utf8") # open existing file in R&W mode
 except IOError:
-    file = open(fn, 'w', encoding="utf8") 
+    file = open(data_path, 'w', encoding="utf8") 
     for c in classes:
         file.write(c+"\n"*3)
     file.close()
-    file = open(fn,"r", encoding="utf8") 
+    file = open(data_path,"r", encoding="utf8") 
 
 
-# In[36]:
+# In[14]:
 
 
 lines = file.readlines()
 file.close()
 
 
-# In[37]:
+# In[15]:
 
 
 for dr in class_names:
-    if not os.path.exists("data/"+dr):
-        os.makedirs("data/" + dr)
+    if not os.path.exists(base + "data/" + dr):
+        os.makedirs(base + "data/" + dr)
     else:
         print(dr, " Already exists")
 
 
-# In[38]:
+# In[16]:
 
 
 for line in lines:
     if line[:-1] in classes:
-        path = "data/"+line[2:-3]
+        path = base+"data/"+line[2:-3]
         
-    elif len(line) < 20:
+    elif len(line) < 10:
         continue
         
     else:
@@ -80,10 +83,10 @@ for line in lines:
         
 
 
-# In[39]:
+# In[17]:
 
 
-backup_path = "backup_raw_data/"
+backup_path = base+"backup_raw_data/"
 c = 0
 flag = 1
 if not os.path.exists(backup_path):
@@ -105,14 +108,14 @@ else:
 
 
 if flag:
-    shutil.copy2(fn, backup_path+backup_name)
+    shutil.copy2(data_path, backup_path+backup_name)
     flag = 1
 
 
-# In[40]:
+# In[18]:
 
 
-file = open(fn, 'w', encoding="utf8")
+file = open(data_path, 'w', encoding="utf8")
 file.truncate(0)
 for c in classes:
         file.write(c+"\n"*3)
